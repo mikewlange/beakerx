@@ -62,6 +62,10 @@ COPY configuration.yml /home/beakerx/
 RUN conda env create -n beakerx -f /home/beakerx/configuration.yml
 RUN conda install -y -n beakerx -c conda-forge jupyterhub jupyterlab pyzmq pytest
 
+#API GATEWAY
+RUN pip install jupyter_kernel_gateway
+RUN jupyter kernelgateway --generate-config
+
 ENV LANG=en_US.UTF-8
 ENV LC_CTYPE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
