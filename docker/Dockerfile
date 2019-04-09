@@ -49,11 +49,6 @@ RUN locale-gen en_US.UTF-8
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 	echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
 	apt-get update && apt-get install yarn -y
-	
-RUN echo "deb https://dl.bintray.com/sbt/debian" | sudo tee -a /etc/apt/sources.list.d/sbt.list  && \ 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 $$ \
-sudo apt-get update  $$ \
-sudo apt-get install sbt
 
 # Install Conda
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
@@ -66,12 +61,6 @@ RUN apt-get clean
 COPY configuration.yml /home/beakerx/
 RUN conda env create -n beakerx -f /home/beakerx/configuration.yml
 RUN conda install -y -n beakerx -c conda-forge jupyterhub jupyterlab pyzmq pytest
-
-#API GATEWAY
-RUN pip install jupyter_kernel_gateway
-RUN jupyter kernelgateway --generate-config
-
-
 
 ENV LANG=en_US.UTF-8
 ENV LC_CTYPE=en_US.UTF-8
