@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.twosigma.beakerx.AutotranslationServiceImpl.BEAKERX;
 import static com.twosigma.beakerx.MessageFactorTest.commMsg;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
@@ -80,10 +81,7 @@ public class KernelTest implements KernelFunctionality {
   private Path tempFolder;
   private Map<String, MagicKernelManager> magicKernels;
   private MagicCommandConfigurationMock magicCommandConfiguration = new MagicCommandConfigurationMock();
-
   private BeakerXJson beakerXJson;
-
-//  public MavenJarResolver.ResolverParams mavenResolverParam = null;
 
   private List<MagicCommandType> magicCommandTypes = null;
   private LinkedList<String> stdinText = new LinkedList<>();
@@ -406,6 +404,16 @@ public class KernelTest implements KernelFunctionality {
     return this.beakerXJson;
   }
 
+  @Override
+  public void startEvaluation() {
+
+  }
+
+  @Override
+  public void endEvaluation() {
+
+  }
+
   public FileServiceMock getFileService() {
     return magicCommandConfiguration.getFileService();
   }
@@ -415,7 +423,9 @@ public class KernelTest implements KernelFunctionality {
 
     @Override
     public Map<String, Map> beakerxJsonAsMap() {
-      return null;
+      HashMap<String, Map> stringMapHashMap = new HashMap<>();
+      stringMapHashMap.put(BEAKERX, new HashMap());
+      return stringMapHashMap;
     }
 
     @Override

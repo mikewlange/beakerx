@@ -49,6 +49,12 @@ public abstract class ValueWidget<T extends Serializable> extends DOMWidget {
     return this.value;
   }
 
+  @Override
+  public void stateRequestHandler() {
+    super.stateRequestHandler();
+    sendUpdate(VALUE, printValue());
+  }
+
   public void setValue(Object value) {
     this.value = decorateValue(getValueFromObject(value));
     sendUpdate(VALUE, printValue());
@@ -121,7 +127,7 @@ public abstract class ValueWidget<T extends Serializable> extends DOMWidget {
   }
 
   @Override
-  protected HashMap<String, Serializable> content(HashMap<String, Serializable> content) {
+  protected HashMap<String, Object> content(HashMap<String, Object> content) {
     super.content(content);
     content.put(DESCRIPTION, this.description);
     content.put(DISABLED, this.disabled);

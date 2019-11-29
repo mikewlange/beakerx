@@ -100,8 +100,6 @@ setup_args = dict(
         'share/jupyter/nbextensions/beakerx',
         get_data_files(os.path.join('beaker'))
     )],
-    install_requires    = [
-    ],
     python_requires='>=3',
     zip_safe            = False,
     include_package_data= True,

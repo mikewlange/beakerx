@@ -38,24 +38,65 @@ describe('(Groovy) Testing of MIME types', function () {
     return beakerxPO.getAllOutputsHtmlType(codeCell)[index];
   }
 
-  describe('(Groovy) Display MIME types ', function () {
-    var testValues = {
-      mathematicalSymbols: /α+η/,
-      headerText: /Hello, world!/,
-      markdownTestValue: /It's very easy to do bold and italics:/,
-      markdownBoldValue: /bold/,
-      markdownItalicsValue: /italics/,
-      mathematicalFormula: /F\(k\)=∫f\(x\)2eπikdx/,
-      groovyFileName: /GroovyTest.ipynb/
-    };
+  function cleanCellOutput(index){
+    var codeCell = beakerxPO.getCodeCellByIndex(index + 1);
+    codeCell.scrollIntoView();
+    codeCell.click();
+    beakerxPO.clickCellAllOutputClear();
+  }
 
-    it('(Latex) Cell outputs mathematical symbols ', function () {
+  var testValues = {
+    headerText: /Hello, world!/,
+    markdownTestValue: /It's very easy to do bold and italics:/,
+    markdownBoldValue: /bold/,
+    markdownItalicsValue: /italics/,
+    mathematicalFormula: /F\(k\)=∫f\(x\)2eπikdx/,
+    groovyFileName: /GroovyTest.ipynb/
+  };
+
+  describe('(Groovy) Display MIME types ', function () {
+    it('(IFrame) Cell displays an iFrame ', function () {
       cellIndex = 0;
       var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
+      var result = getAndWaitHtmlType(codeCell, 0);
+      expect(result.$('iframe[src="http://jupyter.org/"]').isEnabled()).toBeTruthy();
+      cleanCellOutput(cellIndex);
+    });
+
+    it('(VimeoVideo) Cell displays a Vimeo video ', function () {
+      cellIndex += 1;
+      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
+      var result = getAndWaitHtmlType(codeCell, 0);
+      expect(result.$('iframe[src="https://player.vimeo.com/video/139304565"]').isEnabled()).toBeTruthy();
+      cleanCellOutput(cellIndex);
+    });
+
+    it('(YoutubeVideo) Cell displays a YouTube video ', function () {
+      cellIndex += 1;
+      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
+      var result = getAndWaitHtmlType(codeCell, 0);
+      expect(result.$('iframe[src="https://www.youtube.com/embed/gSVvxOchT8Y"]').isEnabled()).toBeTruthy();
+      cleanCellOutput(cellIndex);
+    });
+
+    it('(Video) Cell displays video ', function () {
+      cellIndex += 1;
+      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
+      var result = getAndWaitHtmlType(codeCell, 0);
+      expect(result.$('video[src="https://archive.org/download/Sita_Sings_the_Blues/Sita_Sings_the_Blues_small.mp4"]').isEnabled()).toBeTruthy();
+      cleanCellOutput(cellIndex);
+    });
+
+    it('(Latex) Cell outputs mathematical symbols ', function () {
+      cellIndex += 1;
+      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
+      browser.waitUntil(function(){
+        return codeCell.$$('span.mrow').length > 0;
+      });
       var result = beakerxPO.getAllOutputsExecuteResult(codeCell)[0].getText();
-      expect(result.charCodeAt(0).toString(16)).toEqual('3b1');
-      expect(result.charCodeAt(1).toString(16)).toEqual('2b');
-      expect(result.charCodeAt(2).toString(16)).toEqual('3b7');
+      expect(result.charCodeAt(1).toString(16)).toEqual('defc');
+      expect(result.charCodeAt(2).toString(16)).toEqual('2b');
+      expect(result.charCodeAt(4).toString(16)).toEqual('df02');
     });
 
     it('(HTML) Cell displays html code ', function () {
@@ -70,7 +111,8 @@ describe('(Groovy) Testing of MIME types', function () {
       cellIndex += 1;
       var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
       var result = beakerxPO.getAllOutputsHtmlType(codeCell)[0];
-      expect(result.$('h2').isExisting()).toBeTruthy();
+      result.$('h2').waitForEnabled();
+      expect(result.$('h2').isEnabled()).toBeTruthy();
       expect(result.getText()).toMatch(testValues.headerText);
     });
 
@@ -85,10 +127,13 @@ describe('(Groovy) Testing of MIME types', function () {
     it('(MIMEContainer) Cell outputs mathematical symbols ', function () {
       cellIndex += 1;
       var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
+      browser.waitUntil(function(){
+        return codeCell.$$('span.mrow').length > 0;
+      });
       var result = beakerxPO.getAllOutputsExecuteResult(codeCell)[0].getText();
-      expect(result.charCodeAt(0).toString(16)).toEqual('3b1');
-      expect(result.charCodeAt(1).toString(16)).toEqual('2b');
-      expect(result.charCodeAt(2).toString(16)).toEqual('3b7');
+      expect(result.charCodeAt(1).toString(16)).toEqual('defc');
+      expect(result.charCodeAt(2).toString(16)).toEqual('2b');
+      expect(result.charCodeAt(4).toString(16)).toEqual('df02');
     });
 
     it('(FileLinks) Cell outputs multiple file links ', function () {
@@ -119,47 +164,18 @@ describe('(Groovy) Testing of MIME types', function () {
       beakerxPO.runAndCheckOutputTextOfExecuteResult(cellIndex, testValues.mathematicalFormula);
     });
 
-    it('(IFrame) Cell displays an iFrame ', function () {
-      cellIndex += 1;
-      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
-      var result = getAndWaitHtmlType(codeCell, 0);
-      expect(result.$('iframe[src="http://jupyter.org/"]').isEnabled()).toBeTruthy();
-      beakerxPO.clickCellAllOutputClear();
-    });
-
-    it('(VimeoVideo) Cell displays a Vimeo video ', function () {
-      cellIndex += 1;
-      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
-      var result = getAndWaitHtmlType(codeCell, 0);
-      expect(result.$('iframe[src="https://player.vimeo.com/video/139304565"]').isEnabled()).toBeTruthy();
-    });
-
-    it('(YoutubeVideo) Cell displays a YouTube video ', function () {
-      cellIndex += 1;
-      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
-      var result = getAndWaitHtmlType(codeCell, 0);
-      expect(result.$('iframe[src="https://www.youtube.com/embed/gSVvxOchT8Y"]').isEnabled()).toBeTruthy();
-    });
-
-    it('(Video) Cell displays video ', function () {
-      cellIndex += 1;
-      var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
-      var result = getAndWaitHtmlType(codeCell, 0);
-      expect(result.$('video[src="https://archive.org/download/Sita_Sings_the_Blues/Sita_Sings_the_Blues_small.mp4"]').isEnabled()).toBeTruthy();
-    });
-
     it('(SVG) Cell displays an SVG element ', function () {
       cellIndex += 1;
       var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
       var result = beakerxPO.getAllOutputsExecuteResult(codeCell)[0];
-      expect(result.$('svg').isEnabled()).toBeTruthy();
+      expect(beakerxPO.getSvgResult(result).isEnabled()).toBeTruthy();
     });
 
     it('(SVG) Cell displays an SVG element from a file', function () {
       cellIndex += 1;
       var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
       var result = beakerxPO.getAllOutputsExecuteResult(codeCell)[0];
-      expect(result.$('svg').isEnabled()).toBeTruthy();
+      expect(beakerxPO.getSvgResult(result).isEnabled()).toBeTruthy();
     });
 
     it('(Image) Cell displays an image element', function () {
@@ -188,6 +204,7 @@ describe('(Groovy) Testing of MIME types', function () {
       var codeCell = beakerxPO.runCodeCellByIndex(cellIndex);
       var result = getAndWaitHtmlType(codeCell, 0);
       expect(result.$('iframe[src="https://www.scribd.com/embeds/71048089/content?start_page=5&view_mode=slideshow"]').isEnabled()).toBeTruthy();
+      cleanCellOutput(cellIndex);
     });
   });
 
